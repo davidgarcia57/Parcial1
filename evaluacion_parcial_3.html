@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Parcial 3</title>
+    <style>
+        /* Estilos generales para centrar todo en la pantalla */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4; /* Fondo gris claro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* La tarjeta blanca central */
+        .card {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px; /* Bordes redondeados */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Sombra suave */
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+        }
+
+        /* Títulos */
+        h1 {
+            color: #222;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedor para los dos botones verdes */
+        .botones-superiores {
+            display: flex;
+            gap: 20px; /* Espacio entre botones */
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo base de los botones */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        /* Estilo específico Botones Verdes (Interfaz y Gráficas) */
+        .btn-verde {
+            background-color: white;
+            color: #198754; /* Color verde similar a la imagen */
+            border: 2px solid #198754;
+            flex: 1; /* Para que ambos midan lo mismo */
+        }
+
+        .btn-verde:hover {
+            background-color: #198754;
+            color: white;
+        }
+
+        /* Estilo específico Botón Morado (Regresar) */
+        .btn-morado {
+            background-color: white;
+            color: #5a3ac9; /* Color morado/azul similar a la imagen */
+            border: 2px solid #5a3ac9;
+            width: 100%; /* Ocupa todo el ancho */
+            box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
+            display: block;
+        }
+
+        .btn-morado:hover {
+            background-color: #5a3ac9;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>EVALUACIÓN PARCIAL 3</h1>
+        
+        <h2>ALUMNO: GARCÍA PÁEZ DAVID ISRAEL</h2>
+
+        <div class="botones-superiores">
+            <a href="https://bounce-smart-91506241.figma.site" class="btn btn-verde">INTERFÁZ</a>
+            <a href="graficas.html" class="btn btn-verde">GRAFÍCAS</a>
+        </div>
+
+        <a href="index.html" class="btn btn-morado">REGRESAR AL MENÚ PRINCIPAL</a>
+    </div>
+
+</body>
+</html>

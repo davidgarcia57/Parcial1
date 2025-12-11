@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Gráfica</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center; background: white;
+            padding: 40px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 800px; width: 90%;
+        }
+        h1 { color: #333; font-size: 24px; margin-bottom: 20px; font-weight: 700; }
+        h2 { color: #666; font-size: 16px; margin-bottom: 40px; font-weight: normal; }
+        
+        .pie-chart {
+            width: 280px; height: 280px;
+            border-radius: 50%; margin: 0 auto 30px auto;
+            background: #eee; /* Fondo gris mientras carga */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.5s ease;
+        }
+        
+        .legend { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; font-size: 15px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .color-box { width: 18px; height: 18px; border-radius: 4px; }
+
+        .btn-regresar {
+            background-color: #3b3bff; color: white;
+            padding: 15px 50px; border-radius: 8px;
+            text-decoration: none; font-weight: bold;
+            font-size: 16px; display: inline-block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-regresar:hover { background-color: #2a2abf; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="titulo-pregunta">Cargando datos...</h1>
+        
+        <div id="grafica" class="pie-chart"></div>
+
+        <div id="leyenda" class="legend"></div>
+
+        <a href="graficas.html" class="btn-regresar">Regresar a Menú Principal</a>
+    </div>
+
+    <script>
+        // 1. DATOS DEL CSV (Copiados exactamente de tu archivo)
+        // Lista de las 15 preguntas
+        const preguntas = [
+            "1. ¿Es la navegación intuitiva para un usuario de primera vez?",
+            "2. ¿El flujo de tareas es eficiente y minimiza los clics?",
+            "3. ¿Existe retroalimentación clara del sistema (Feedback)?",
+            "4. ¿Es clara la prevención y recuperación de errores?",
+            "5. ¿El modelo mental coincide con el del usuario final?",
+            "6. ¿Es consistente el sistema de diseño (patrones, colores)?",
+            "7. ¿Es clara la jerarquía visual?",
+            "8. ¿El diseño es escalable para nuevas funcionalidades?",
+            "9. ¿Es legible el contenido (fuente, contraste)?",
+            "10. ¿El diseño cumple con estándares de contraste (WCAG)?",
+            "11. ¿Se ha considerado la navegación sin ratón (teclado)?",
+            "12. ¿El diseño utiliza iconos además del color?",
+            "13. ¿Es factible implementar las animaciones propuestas?",
+            "14. ¿El prototipo contempla los 'Edge Cases'?",
+            "15. ¿Cómo se comporta el diseño en diferentes dispositivos?"
+        ];
+
+        // Respuestas de las 3 personas (Filas del CSV)
+        const respuestasRaw = [
+            [10, 10, 9, 10, 10, 10, 9, 9, 10, 9, 10, 10, 10, 10, 10], // Persona 1
+            [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],            // Persona 2
+            [9, 8, 8, 10, 9, 7, 9, 9, 10, 9, 10, 4, 6, 5, 7]          // Persona 3
+        ];
+
+        // 2. CONFIGURACIÓN DE CATEGORÍAS (Para que se vea como "Bueno/Malo")
+        function obtenerCategoria(valor) {
+            if (valor >= 9) return { texto: 'Bueno', color: '#2196F3' }; // Azul
+            if (valor >= 7) return { texto: 'Regular', color: '#FFEB3B' }; // Amarillo
+            return { texto: 'Malo', color: '#FF4081' }; // Rosa
+        }
+
+        try {
+            // 3. OBTENER LA PREGUNTA DE LA URL
+            const params = new URLSearchParams(window.location.search);
+            const qParam = params.get('q');
+            
+            // Validación: Si no hay "q" o es inválida, usar la 1
+            let index = 0;
+            if (qParam && !isNaN(qParam)) {
+                index = parseInt(qParam) - 1;
+            }
+            
+            // Asegurar que el índice esté dentro del rango (0 a 14)
+            if (index < 0 || index >= preguntas.length) index = 0;
+
+            // 4. PROCESAR LOS DATOS
+            const titulo = preguntas[index];
+            const datosPregunta = respuestasRaw.map(persona => persona[index]); // Ej: [10, 8, 9]
+
+            // Agrupar por categorías (Bueno, Regular, Malo)
+            const conteo = {};
+            datosPregunta.forEach(val => {
+                const cat = obtenerCategoria(val);
+                // Usamos el texto como clave para agrupar
+                if (!conteo[cat.texto]) {
+                    conteo[cat.texto] = { cantidad: 0, color: cat.color };
+                }
+                conteo[cat.texto].cantidad++;
+            });
+
+            const total = datosPregunta.length;
+
+            // 5. GENERAR GRÁFICA Y LEYENDA
+            let gradienteStr = "conic-gradient(";
+            let porcentajeAcumulado = 0;
+            let leyendaHTML = "";
+
+            for (const [nombre, datos] of Object.entries(conteo)) {
+                const porcentaje = (datos.cantidad / total) * 100;
+                
+                // Construir parte del gráfico CSS
+                gradienteStr += `${datos.color} ${porcentajeAcumulado}% ${porcentajeAcumulado + porcentaje}%, `;
+                porcentajeAcumulado += porcentaje;
+
+                // Construir leyenda
+                leyendaHTML += `
+                    <div class="legend-item">
+                        <div class="color-box" style="background-color: ${datos.color};"></div>
+                        <span>${nombre} (${Math.round(porcentaje)}%)</span>
+                    </div>
+                `;
+            }
+
+            // Limpiar sintaxis CSS
+            gradienteStr = gradienteStr.slice(0, -2) + ")";
+
+            // 6. MOSTRAR EN PANTALLA
+            document.getElementById('titulo-pregunta').innerText = titulo;
+            document.getElementById('grafica').style.background = gradienteStr;
+            document.getElementById('leyenda').innerHTML = leyendaHTML;
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('titulo-pregunta').innerText = "Error al cargar los datos.";
+            document.getElementById('grafica').style.display = "none";
+        }
+    </script>
+</body>
+</html>
