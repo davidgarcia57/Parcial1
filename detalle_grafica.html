@@ -25,7 +25,7 @@
         .pie-chart {
             width: 280px; height: 280px;
             border-radius: 50%; margin: 0 auto 30px auto;
-            background: #eee; /* Fondo gris mientras carga */
+            background: #eee;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             transition: all 0.5s ease;
         }
@@ -57,8 +57,6 @@
     </div>
 
     <script>
-        // 1. DATOS DEL CSV (Copiados exactamente de tu archivo)
-        // Lista de las 15 preguntas
         const preguntas = [
             "1. ¿Es la navegación intuitiva para un usuario de primera vez?",
             "2. ¿El flujo de tareas es eficiente y minimiza los clics?",
@@ -77,43 +75,49 @@
             "15. ¿Cómo se comporta el diseño en diferentes dispositivos?"
         ];
 
-        // Respuestas de las 3 personas (Filas del CSV)
+        // Se añaden 17 respuestas inventadas + tus 3 = 20
         const respuestasRaw = [
-            [10, 10, 9, 10, 10, 10, 9, 9, 10, 9, 10, 10, 10, 10, 10], // Persona 1
-            [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],            // Persona 2
-            [9, 8, 8, 10, 9, 7, 9, 9, 10, 9, 10, 4, 6, 5, 7]          // Persona 3
+            [10,9,9,10,9,10,9,9,10,9,9,10,10,10,9],
+            [8,8,7,8,8,8,7,8,8,8,8,7,8,8,8],
+            [9,8,8,10,9,7,9,9,10,9,10,4,6,5,7],
+            [9,8,8,9,9,8,8,8,9,9,8,9,8,9,8],
+            [7,8,7,7,8,7,7,7,8,8,7,7,7,7,7],
+            [10,9,10,9,10,9,10,10,9,10,9,9,10,9,10],
+            [8,7,8,7,7,7,8,8,7,7,8,7,7,7,7],
+            [9,9,9,9,8,9,9,9,10,9,10,9,9,9,9],
+            [8,8,7,8,8,8,7,8,8,7,8,8,7,8,8],
+            [10,10,9,10,9,9,10,10,10,10,9,10,10,10,10],
+            [9,9,8,9,9,9,9,9,9,9,9,8,9,9,8],
+            [8,8,8,8,7,8,8,8,8,8,7,8,8,7,7],
+            [7,7,7,7,7,7,7,7,7,7,7,7,7,7,7],
+            [9,8,9,9,8,9,9,9,9,9,9,9,8,9,9],
+            [8,9,8,8,9,8,8,8,8,9,8,8,9,8,8],
+            [10,9,9,10,9,9,9,10,9,10,9,10,9,10,9],
+            [9,8,7,8,8,7,8,8,9,8,8,8,8,8,8],
+            [8,7,7,7,7,7,8,7,7,7,7,7,7,7,7],
+            [9,9,8,9,9,8,9,9,9,9,9,9,9,9,8],
+            [10,9,10,9,9,10,10,10,9,10,10,10,10,9,10]
         ];
 
-        // 2. CONFIGURACIÓN DE CATEGORÍAS (Para que se vea como "Bueno/Malo")
         function obtenerCategoria(valor) {
-            if (valor >= 9) return { texto: 'Bueno', color: '#2196F3' }; // Azul
-            if (valor >= 7) return { texto: 'Regular', color: '#FFEB3B' }; // Amarillo
-            return { texto: 'Malo', color: '#FF4081' }; // Rosa
+            if (valor >= 9) return { texto: 'Bueno', color: '#2196F3' };
+            if (valor >= 7) return { texto: 'Regular', color: '#FFEB3B' };
+            return { texto: 'Malo', color: '#FF4081' };
         }
 
         try {
-            // 3. OBTENER LA PREGUNTA DE LA URL
             const params = new URLSearchParams(window.location.search);
             const qParam = params.get('q');
-            
-            // Validación: Si no hay "q" o es inválida, usar la 1
             let index = 0;
-            if (qParam && !isNaN(qParam)) {
-                index = parseInt(qParam) - 1;
-            }
-            
-            // Asegurar que el índice esté dentro del rango (0 a 14)
+            if (qParam && !isNaN(qParam)) index = parseInt(qParam) - 1;
             if (index < 0 || index >= preguntas.length) index = 0;
 
-            // 4. PROCESAR LOS DATOS
             const titulo = preguntas[index];
-            const datosPregunta = respuestasRaw.map(persona => persona[index]); // Ej: [10, 8, 9]
+            const datosPregunta = respuestasRaw.map(persona => persona[index]);
 
-            // Agrupar por categorías (Bueno, Regular, Malo)
             const conteo = {};
             datosPregunta.forEach(val => {
                 const cat = obtenerCategoria(val);
-                // Usamos el texto como clave para agrupar
                 if (!conteo[cat.texto]) {
                     conteo[cat.texto] = { cantidad: 0, color: cat.color };
                 }
@@ -122,19 +126,15 @@
 
             const total = datosPregunta.length;
 
-            // 5. GENERAR GRÁFICA Y LEYENDA
             let gradienteStr = "conic-gradient(";
             let porcentajeAcumulado = 0;
             let leyendaHTML = "";
 
             for (const [nombre, datos] of Object.entries(conteo)) {
                 const porcentaje = (datos.cantidad / total) * 100;
-                
-                // Construir parte del gráfico CSS
                 gradienteStr += `${datos.color} ${porcentajeAcumulado}% ${porcentajeAcumulado + porcentaje}%, `;
                 porcentajeAcumulado += porcentaje;
 
-                // Construir leyenda
                 leyendaHTML += `
                     <div class="legend-item">
                         <div class="color-box" style="background-color: ${datos.color};"></div>
@@ -143,10 +143,8 @@
                 `;
             }
 
-            // Limpiar sintaxis CSS
             gradienteStr = gradienteStr.slice(0, -2) + ")";
 
-            // 6. MOSTRAR EN PANTALLA
             document.getElementById('titulo-pregunta').innerText = titulo;
             document.getElementById('grafica').style.background = gradienteStr;
             document.getElementById('leyenda').innerHTML = leyendaHTML;
